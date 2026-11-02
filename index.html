@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Operations Console | KaamConnect</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="dash-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <i class="fa-solid fa-toolbox" style="color: #f59e0b;"></i>
+          <span>Kaam<span style="color: #f59e0b;">Connect</span></span>
+        </a>
+        <span class="role-badge admin">Admin</span>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="sidebar-item">
+          <a href="index.html" class="sidebar-link active">
+            <i class="fa-solid fa-chart-pie"></i> Platform Overview
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#kycQueue" class="sidebar-link">
+            <i class="fa-solid fa-id-card"></i> KYC Verification
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#allBookings" class="sidebar-link">
+            <i class="fa-solid fa-clipboard-list"></i> Bookings Monitor
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#workerList" class="sidebar-link">
+            <i class="fa-solid fa-users-gear"></i> Workers Roster
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#categorySection" class="sidebar-link">
+            <i class="fa-solid fa-shapes"></i> Category Manager
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="../index.html" class="sidebar-link">
+            <i class="fa-solid fa-house"></i> View Website
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" style="background: #b45309;">AD</div>
+        <div class="user-info">
+          <h5>Admin Operations</h5>
+          <p>Super Officer &bull; HQ Delhi</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dash-main">
+      <header class="dash-topbar">
+        <div class="dash-topbar-title">
+          <h2>Admin Operations Console</h2>
+          <span style="font-size: 0.85rem; color: #64748b;">Manage KYC verifications, service categories, and platform analytics.</span>
+        </div>
+
+        <div class="dash-topbar-actions">
+          <button class="btn btn-outline btn-sm" onclick="toggleLanguage()">
+            <i class="fa-solid fa-language"></i> <span id="langToggleText">हिन्दी</span>
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="exportBookingsToCSV()">
+            <i class="fa-solid fa-file-csv" style="color: #10b981;"></i> Export to CSV
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="addNewCategoryPrompt()">
+            <i class="fa-solid fa-plus"></i> Add Category
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="handleLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <div class="dash-body">
+        <!-- Metrics Row -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-data">
+              <p>Total Registered Karigars</p>
+              <h3 id="adminWorkerCount">0</h3>
+            </div>
+            <div class="metric-icon-box icon-blue">
+              <i class="fa-solid fa-helmet-safety"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-data">
+              <p>KYC Pending Verifications</p>
+              <h3 id="adminPendingKyc" style="color: #d97706;">0</h3>
+            </div>
+            <div class="metric-icon-box icon-amber">
+              <i class="fa-solid fa-id-card-clip"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-data">
+              <p>Total Completed Jobs</p>
+              <h3 id="adminCompletedCount">0</h3>
+            </div>
+            <div class="metric-icon-box icon-green">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-data">
+              <p>Platform GMV Volume</p>
+              <h3 id="adminRevenue">₹0</h3>
+            </div>
+            <div class="metric-icon-box icon-purple">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- KYC Verification Queue -->
+        <div class="dash-card" id="kycQueue">
+          <div class="dash-card-header">
+            <h3><i class="fa-solid fa-shield-halved" style="color: #2563eb; margin-right: 8px;"></i> Worker Aadhaar / KYC Verification Queue</h3>
+            <span class="badge badge-warning" id="kycQueueBadge">0 Awaiting Review</span>
+          </div>
+
+          <div class="dash-table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Worker Name</th>
+                  <th>Trade Skill</th>
+                  <th>City / Locality</th>
+                  <th>ID Document</th>
+                  <th>Verification Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="kycQueueTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- All Platform Bookings Monitor -->
+        <div class="dash-card" id="allBookings">
+          <div class="dash-card-header">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <h3 style="margin: 0;"><i class="fa-solid fa-list-check" style="color: #10b981; margin-right: 8px;"></i> Real-Time Platform Bookings Monitor</h3>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="text" id="adminBookingSearch" class="form-control" style="width: 220px; padding: 0.35rem 0.75rem; font-size: 0.82rem;" placeholder="Filter code, customer..." onkeyup="filterAdminBookings(this.value)">
+              <button class="btn btn-sm btn-outline" onclick="loadAdminData()">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="dash-table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Customer</th>
+                  <th>Assigned Karigar</th>
+                  <th>Trade / Service</th>
+                  <th>Date & Time</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Invoice</th>
+                </tr>
+              </thead>
+              <tbody id="adminBookingsTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Workers Roster & Management -->
+        <div class="dash-card" id="workerList">
+          <div class="dash-card-header">
+            <h3><i class="fa-solid fa-users-gear" style="color: #2563eb; margin-right: 8px;"></i> Registered Workers Roster</h3>
+            <span style="font-size: 0.85rem; color: #64748b;">Manage worker active duty and catalog profiles</span>
+          </div>
+
+          <div class="dash-table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th>Worker</th>
+                  <th>Category</th>
+                  <th>City</th>
+                  <th>Rate</th>
+                  <th>Rating</th>
+                  <th>Availability</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminWorkersTable">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Category Manager -->
+        <div class="dash-card" id="categorySection">
+          <div class="dash-card-header">
+            <h3><i class="fa-solid fa-shapes" style="color: #f59e0b; margin-right: 8px;"></i> Service Categories & Pricing</h3>
+            <button class="btn btn-sm btn-primary" onclick="addNewCategoryPrompt()">
+              <i class="fa-solid fa-plus"></i> New Category
+            </button>
+          </div>
+          <div style="padding: 1.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;" id="adminCategoriesGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ====================================================
+       PRINTABLE TAX INVOICE MODAL
+       ==================================================== -->
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal-dialog" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-invoice" style="color: #2563eb; margin-right: 8px;"></i> Official Tax Invoice</h3>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-sm btn-outline" onclick="printInvoice()"><i class="fa-solid fa-print"></i> Print</button>
+          <button class="modal-close-btn" onclick="closeInvoiceModal()">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" id="invoiceContentArea" style="padding: 1rem;">
+        <!-- Dynamically rendered invoice -->
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAdminData();
+    });
+
+    let currentAdminBookings = [];
+
+    function loadAdminData() {
+      const workers = getStoredData('workers', KaamData.workers);
+      currentAdminBookings = getStoredData('bookings', KaamData.bookings);
+      const categories = getStoredData('categories', KaamData.categories);
+
+      const pendingKycCount = workers.filter(w => w.kycStatus === 'PENDING').length;
+      document.getElementById('adminWorkerCount').innerText = workers.length;
+      document.getElementById('adminPendingKyc').innerText = pendingKycCount;
+      document.getElementById('kycQueueBadge').innerText = `${pendingKycCount} Awaiting Review`;
+
+      let totalCompleted = 0;
+      let totalGmv = 0;
+      currentAdminBookings.forEach(b => {
+        if (b.status === 'COMPLETED') {
+          totalCompleted++;
+          totalGmv += Number(b.totalAmount);
+        }
+      });
+      document.getElementById('adminCompletedCount').innerText = totalCompleted + 195;
+      document.getElementById('adminRevenue').innerText = '₹' + (totalGmv + 192000).toLocaleString('en-IN');
+
+      // 1. Render KYC Table
+      const kycTable = document.getElementById('kycQueueTable');
+      if (kycTable) {
+        kycTable.innerHTML = workers.map(w => `
+          <tr>
+            <td>
+              <strong>${w.name}</strong><br>
+              <span style="font-size: 0.8rem; color: #64748b;">${w.phone}</span>
+            </td>
+            <td><strong>${w.categoryName}</strong></td>
+            <td>${w.city}</td>
+            <td>
+              <span style="font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">
+                AADHAAR: XXXX-${(w.id * 1111) % 9000 + 1000}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${w.kycStatus === 'VERIFIED' ? 'badge-success' : (w.kycStatus === 'REJECTED' ? 'badge-danger' : 'badge-warning')}">
+                ${w.kycStatus}
+              </span>
+            </td>
+            <td>
+              ${w.kycStatus === 'PENDING' ? `
+                <button class="btn btn-sm btn-primary" onclick="setKycStatus(${w.id}, 'VERIFIED')">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button class="btn btn-sm btn-outline" style="color: #ef4444;" onclick="setKycStatus(${w.id}, 'REJECTED')">
+                  Reject
+                </button>
+              ` : `
+                <button class="btn btn-sm btn-outline" onclick="setKycStatus(${w.id}, 'PENDING')">
+                  Re-evaluate
+                </button>
+              `}
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // 2. Render Bookings Table
+      renderAdminBookingsTable(currentAdminBookings);
+
+      // 3. Render Workers Roster Table
+      const workersTable = document.getElementById('adminWorkersTable');
+      if (workersTable) {
+        workersTable.innerHTML = workers.map(w => `
+          <tr>
+            <td>
+              <strong>${w.name}</strong><br>
+              <span style="font-size: 0.8rem; color: #64748b;">${w.phone}</span>
+            </td>
+            <td>${w.categoryName}</td>
+            <td>${w.city}</td>
+            <td><strong>₹${w.hourlyRate}/hr</strong></td>
+            <td><span style="color: #f59e0b;"><i class="fa-solid fa-star"></i> ${w.rating}</span></td>
+            <td>
+              <span class="status-indicator ${w.isAvailable ? 'online' : 'offline'}" style="position: static; display: inline-block; vertical-align: middle; margin-right: 4px;"></span>
+              ${w.isAvailable ? 'Available' : 'Offline'}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="toggleWorkerDutyAdmin(${w.id})">
+                ${w.isAvailable ? 'Set Offline' : 'Set Available'}
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // 4. Render Categories Grid
+      const catGrid = document.getElementById('adminCategoriesGrid');
+      if (catGrid) {
+        catGrid.innerHTML = categories.map(c => `
+          <div style="border: 1px solid #e2e8f0; padding: 1rem; border-radius: 8px; background: #fafafa;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem;">
+              <i class="fa-solid ${c.icon}" style="color: #2563eb;"></i>
+              <strong>${c.name}</strong>
+            </div>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">Base: ₹${c.basePrice}</p>
+            <span class="badge badge-success">Active</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderAdminBookingsTable(bookings) {
+      const bookingsTable = document.getElementById('adminBookingsTable');
+      if (!bookingsTable) return;
+
+      if (bookings.length === 0) {
+        bookingsTable.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #64748b;">No matching bookings.</td></tr>`;
+        return;
+      }
+
+      bookingsTable.innerHTML = bookings.map(b => {
+        let badgeClass = 'badge-warning';
+        if (b.status === 'ACCEPTED' || b.status === 'IN_PROGRESS') badgeClass = 'badge-info';
+        if (b.status === 'COMPLETED') badgeClass = 'badge-success';
+        if (b.status === 'CANCELLED' || b.status === 'REJECTED') badgeClass = 'badge-danger';
+
+        return `
+          <tr>
+            <td><strong>${b.bookingCode}</strong></td>
+            <td>${b.customerName}</td>
+            <td><strong>${b.workerName}</strong></td>
+            <td>${b.serviceTitle}</td>
+            <td>${b.date} &bull; ${b.timeSlot}</td>
+            <td><strong>₹${b.totalAmount}</strong></td>
+            <td><span class="badge ${badgeClass}">${b.status}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="openInvoiceModal(${b.id})" title="Inspect Official Bill">
+                <i class="fa-solid fa-file-invoice" style="color: #2563eb;"></i> Bill
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterAdminBookings(query) {
+      if (!query || query.trim() === '') {
+        renderAdminBookingsTable(currentAdminBookings);
+        return;
+      }
+      const q = query.toLowerCase().trim();
+      const filtered = currentAdminBookings.filter(b => 
+        b.bookingCode.toLowerCase().includes(q) ||
+        b.customerName.toLowerCase().includes(q) ||
+        b.workerName.toLowerCase().includes(q) ||
+        b.status.toLowerCase().includes(q)
+      );
+      renderAdminBookingsTable(filtered);
+    }
+
+    function setKycStatus(workerId, status) {
+      let workers = getStoredData('workers', KaamData.workers);
+      workers = workers.map(w => {
+        if (w.id === workerId) {
+          w.kycStatus = status;
+        }
+        return w;
+      });
+      setStoredData('workers', workers);
+      showToast(`Worker ID #${workerId} KYC status changed to ${status}`, 'success');
+      loadAdminData();
+    }
+
+    function toggleWorkerDutyAdmin(workerId) {
+      let workers = getStoredData('workers', KaamData.workers);
+      workers = workers.map(w => {
+        if (w.id === workerId) {
+          w.isAvailable = !w.isAvailable;
+        }
+        return w;
+      });
+      setStoredData('workers', workers);
+      showToast('Worker availability updated', 'info');
+      loadAdminData();
+    }
+
+    function addNewCategoryPrompt() {
+      const name = prompt('Enter new service category name (e.g. RO Water Purifier Technician):');
+      if (!name) return;
+      const price = prompt('Enter starting base price (₹):', '399');
+      let categories = getStoredData('categories', KaamData.categories);
+      categories.push({
+        id: categories.length + 1,
+        name: name,
+        slug: name.toLowerCase().replace(/\s+/g, '-'),
+        icon: 'fa-screwdriver-wrench',
+        basePrice: parseInt(price) || 299,
+        desc: 'Professional technicians ready for on-site troubleshooting.'
+      });
+      setStoredData('categories', categories);
+      showToast(`Category "${name}" added successfully!`, 'success');
+      loadAdminData();
+    }
+  </script>
+</body>
+</html>
